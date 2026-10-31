@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary, Deductions & Income Tax Calculation System</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #f8f9fa;
+            --border-color: #ccc;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #eef2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+        .section-title {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-save { background-color: #28a745; color: white; }
+        .btn-save:hover { background-color: #218838; }
+        .btn-edit { background-color: #ffc107; color: #333; }
+        .btn-edit:hover { background-color: #e0a800; }
+        .btn-delete { background-color: #dc3545; color: white; }
+        .btn-delete:hover { background-color: #c82333; }
+        .btn-print { background-color: #17a2b8; color: white; }
+        .btn-print:hover { background-color: #138496; }
+
+        /* Output Sheet View */
+        .output-sheet {
+            margin-top: 40px;
+            border: 2px solid #333;
+            padding: 25px;
+            background: #fff;
+        }
+        .sheet-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .sheet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .table-box {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .table-box th, .table-box td {
+            border: 1px solid #999;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+        .table-box th {
+            background-color: #f1f3f4;
+            text-align: left;
+        }
+        .footer-signature {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            border-top: 1px dashed #666;
+            padding-top: 15px;
+        }
+
+        /* Print Settings for A4 Landscape */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .output-sheet {
+                border: none;
+                margin: 0;
+                padding: 0;
+                page-break-after: always;
+            }
+            @page {
+                size: A4 landscape;
+                margin: 10mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Employee Salary, Deductions & Income Tax System</h2>
+
+    <!-- DATA ENTRY SHEET -->
+    <div class="no-print">
+        <div class="section-title">1. Employee & Month Selection</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Employee Name (NAME)</label>
+                <input type="text" id="empName" placeholder="Enter Full Name">
+            </div>
+            <div class="form-group">
+                <label>School Name</label>
+                <input type="text" id="schoolName" placeholder="Enter School Name">
+            </div>
+            <div class="form-group">
+                <label>KGID Number</label>
+                <input type="text" id="kgidNo" placeholder="Enter KGID Number">
+            </div>
+            <div class="form-group">
+                <label>PAN Number</label>
+                <input type="text" id="panNo" placeholder="Enter PAN Number">
+            </div>
+            <div class="form-group">
+                <label>Select Month</label>
+                <select id="selectMonth">
+                    <option value="">-- Select Month --</option>
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-title">2. Earnings & Basic Details</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Basic Pay Tier</label>
+                <select id="selectBasicTier">
+                    <option value="">-- Select Basic Slab --</option>
+                    <option value="33400">33,400</option>
+                    <option value="45000">45,000</option>
+                    <option value="60000">60,000</option>
+                    <option value="80000">80,000</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Basic Salary Amount (₹)</label>
+                <input type="number" id="basicAmt" placeholder="Enter Basic Salary" oninput="calculateValues()">
+            </div>
+            <div class="form-group">
+                <label>SFN (Special Allowance)</label>
+                <select id="selectSfn" onchange="calculateValues()">
+                    <option value="0">0 (None)</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-title">3. Deduction Entries</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>KGID PREMIUM</label>
+                <input type="number" id="kgidPrem" value="0" oninput="calculateValues()">
+            </div>
+            <div class="form-group">
+                <label>GPF PREMIUM</label>
+                <input type="number" id="gpfPrem" value="0" oninput="calculateValues()">
+            </div>
+            <div class="form-group">
+                <label>LIC PREMIUM</label>
+                <input type="number" id="licPrem" value="0" oninput="calculateValues()">
+            </div>
+            <div class="form-group">
+                <label>KGID LOAN</label>
+                <input type="number" id="kgidLoan" value="0" oninput="calculateValues()">
+            </div>
+            <div class="form-group">
+                <label>GPF LOAN</label>
+                <input type="number" id="gpfLoan" value="0" oninput="calculateValues()">
+            </div>
+            <div class="form-group">
+                <label>LOCAL RECOVERY KASS</label>
+                <input type="number" id="localRecovery" value="0" oninput="calculateValues()">
+            </div>
+            <div class="form-group">
+                <label>Annual 80C Deductions (Old Regime Only)</label>
+                <input type="number" id="sec80C" value="150000" oninput="calculateValues()">
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn-save" onclick="saveData()">Save Entry</button>
+            <button class="btn-edit" onclick="editData()">Edit Data</button>
+            <button class="btn-delete" onclick="deleteData()">Delete Record</button>
+            <button class="btn-print" onclick="window.print()">Print A4 Landscape</button>
+        </div>
+    </div>
+
+    <!-- CALCULATION & OUTPUT SHEET -->
+    <div class="output-sheet" id="printableArea">
+        <div class="sheet-header">
+            <h3>GOVERNMENT OF KARNATAKA - SALARY & INCOME TAX STATEMENT</h3>
+            <p><strong>Month:</strong> <span id="outMonth">---</span></p>
+        </div>
+
+        <table class="table-box">
+            <tr>
+                <th width="20%">Employee Name:</th>
+                <td width="30%" id="outName">---</td>
+                <th width="20%">KGID Number:</th>
+                <td width="30%" id="outKgid">---</td>
+            </tr>
+            <tr>
+                <th>School Name:</th>
+                <td id="outSchool">---</td>
+                <th>PAN Number:</th>
+                <td id="outPan">---</td>
+            </tr>
+        </table>
+
+        <div class="sheet-grid">
+            <div>
+                <h4>MONTHLY EARNINGS</h4>
+                <table class="table-box">
+                    <tr><th>Component</th><th>Amount (₹)</th></tr>
+                    <tr><td>Basic Salary</td><td id="outBasic">0.00</td></tr>
+                    <tr><td>SFN (Special Allowance)</td><td id="outSfn">0.00</td></tr>
+                    <tr><td>DA (42.5%)</td><td id="outDa">0.00</td></tr>
+                    <tr><td>HRA (10%)</td><td id="outHra">0.00</td></tr>
+                    <tr style="font-weight: bold; background: #e9ecef;">
+                        <td>Total Gross Salary</td>
+                        <td id="outGross">0.00</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                <h4>MONTHLY DEDUCTIONS</h4>
+                <table class="table-box">
+                    <tr><th>Component</th><th>Amount (₹)</th></tr>
+                    <tr><td>KGID Premium</td><td id="outKgidPrem">0.00</td></tr>
+                    <tr><td>GPF Premium</td><td id="outGpfPrem">0.00</td></tr>
+                    <tr><td>LIC Premium</td><td id="outLicPrem">0.00</td></tr>
+                    <tr><td>KGID/GPF Loans</td><td id="outLoans">0.00</td></tr>
+                    <tr><td>Local Recovery KASS</td><td id="outLocalRec">0.00</td></tr>
+                    <tr style="font-weight: bold; background: #e9ecef;">
+                        <td>Total Deductions</td>
+                        <td id="outTotalDed">0.00</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <table class="table-box" style="margin-top: 5px;">
+            <tr style="background-color: #d4edda; font-weight: bold;">
+                <td width="70%" style="text-align: right;">NET PAYABLE SALARY (Monthly):</td>
+                <td width="30%" id="outNetPay">0.00</td>
+            </tr>
+        </table>
+
+        <!-- INCOME TAX OLD VS NEW REGIME SECTION -->
+        <h4 style="margin-top: 25px; border-bottom: 2px solid #333; padding-bottom: 5px;">INCOME TAX CALCULATION (OLD REGIME vs NEW REGIME)</h4>
+        <table class="table-box">
+            <tr>
+                <th width="40%">Tax Parameter / Head</th>
+                <th width="30%">Old Tax Regime (₹)</th>
+                <th width="30%">New Tax Regime (₹)</th>
+            </tr>
+            <tr>
+                <td>Estimated Annual Gross Salary (× 12)</td>
+                <td id="itAnnualGrossOld">0.00</td>
+                <td id="itAnnualGrossNew">0.00</td>
+            </tr>
+            <tr>
+                <td>Standard Deduction</td>
+                <td id="itStdDedOld">50,000.00</td>
+                <td id="itStdDedNew">75,000.00</td>
+            </tr>
+            <tr>
+                <td>Chapter VIA Deductions (80C, etc.)</td>
+                <td id="itSec80C">0.00</td>
+                <td>0.00 (Not Applicable)</td>
+            </tr>
+            <tr style="font-weight: bold; background: #f8f9fa;">
+                <td>Taxable Income</td>
+                <td id="itTaxableOld">0.00</td>
+                <td id="itTaxableNew">0.00</td>
+            </tr>
+            <tr>
+                <td>Calculated Income Tax Liability</td>
+                <td id="itTaxValOld">0.00</td>
+                <td id="itTaxValNew">0.00</td>
+            </tr>
+            <tr>
+                <td>Health & Education Cess (4%)</td>
+                <td id="itCessOld">0.00</td>
+                <td id="itCessNew">0.00</td>
+            </tr>
+            <tr style="background-color: #fff3cd; font-weight: bold; font-size: 14px;">
+                <td>Total Annual Tax Payable</td>
+                <td id="itTotalTaxOld">0.00</td>
+                <td id="itTotalTaxNew">0.00</td>
+            </tr>
+        </table>
+
+        <div class="footer-signature">
+            <span>Designed by :LAKSHMIKANTH R( Mob:9844444871)</span>
+            <span>Signature of Drawing & Disbursing Officer</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateValues() {
+        const empName = document.getElementById('empName').value || "---";
+        const schoolName = document.getElementById('schoolName').value || "---";
+        const kgidNo = document.getElementById('kgidNo').value || "---";
+        const panNo = document.getElementById('panNo').value || "---";
+        const selectMonth = document.getElementById('selectMonth').value || "---";
+
+        const basicAmt = parseFloat(document.getElementById('basicAmt').value) || 0;
+        const sfnAmt = parseFloat(document.getElementById('selectSfn').value) || 0;
+
+        const kgidPrem = parseFloat(document.getElementById('kgidPrem').value) || 0;
+        const gpfPrem = parseFloat(document.getElementById('gpfPrem').value) || 0;
+        const licPrem = parseFloat(document.getElementById('licPrem').value) || 0;
+        const kgidLoan = parseFloat(document.getElementById('kgidLoan').value) || 0;
+        const gpfLoan = parseFloat(document.getElementById('gpfLoan').value) || 0;
+        const localRecovery = parseFloat(document.getElementById('localRecovery').value) || 0;
+        const sec80CInput = parseFloat(document.getElementById('sec80C').value) || 0;
+
+        // Monthly computations
+        const daAmt = basicAmt * 0.425;
+        const hraAmt = basicAmt * 0.10;
+        const grossSalary = basicAmt + sfnAmt + daAmt + hraAmt;
+        const totalLoans = kgidLoan + gpfLoan;
+        const totalDeductions = kgidPrem + gpfPrem + licPrem + totalLoans + localRecovery;
+        const netPayable = grossSalary - totalDeductions;
+
+        // Map Monthly Values
+        document.getElementById('outName').innerText = empName;
+        document.getElementById('outSchool').innerText = schoolName;
+        document.getElementById('outKgid').innerText = kgidNo;
+        document.getElementById('outPan').innerText = panNo;
+        document.getElementById('outMonth').innerText = selectMonth;
+
+        document.getElementById('outBasic').innerText = basicAmt.toFixed(2);
+        document.getElementById('outSfn').innerText = sfnAmt.toFixed(2);
+        document.getElementById('outDa').innerText = daAmt.toFixed(2);
+        document.getElementById('outHra').innerText = hraAmt.toFixed(2);
+        document.getElementById('outGross').innerText = grossSalary.toFixed(2);
+
+        document.getElementById('outKgidPrem').innerText = kgidPrem.toFixed(2);
+        document.getElementById('outGpfPrem').innerText = gpfPrem.toFixed(2);
+        document.getElementById('outLicPrem').innerText = licPrem.toFixed(2);
+        document.getElementById('outLoans').innerText = totalLoans.toFixed(2);
+        document.getElementById('outLocalRec').innerText = localRecovery.toFixed(2);
+        document.getElementById('outTotalDed').innerText = totalDeductions.toFixed(2);
+        document.getElementById('outNetPay').innerText = netPayable.toFixed(2);
+
+        // --- INCOME TAX CALCULATION LOGIC (OLD VS NEW REGIME) ---
+        const annualGross = grossSalary * 12;
+
+        // 1. Old Regime Tax Computation
+        const stdDedOld = 50000;
+        const actual80C = Math.min(sec80CInput, 150000); // capped at 1.5L
+        let taxableOld = annualGross - stdDedOld - actual80C;
+        if (taxableOld < 0) taxableOld = 0;
+
+        let taxOld = 0;
+        if (taxableOld > 1000000) {
+            taxOld = 112500 + (taxableOld - 1000000) * 0.30;
+        } else if (taxableOld > 500000) {
+            taxOld = 12500 + (taxableOld - 500000) * 0.20;
+        } else if (taxableOld > 250000) {
+            taxOld = (taxableOld - 250000) * 0.05;
+        }
+        // Section 87A rebate for old regime if taxable <= 5L
+        if (taxableOld <= 500000) taxOld = 0;
+
+        const cessOld = taxOld * 0.04;
+        const totalTaxOld = taxOld + cessOld;
+
+        // 2. New Regime Tax Computation
+        const stdDedNew = 75000;
+        let taxableNew = annualGross - stdDedNew;
+        if (taxableNew < 0) taxableNew = 0;
+
+        let taxNew = 0;
+        // Simplified new tax slab calculation structure
+        if (taxableNew > 2400000) {
+            taxNew = 300000 + (taxableNew - 2400000) * 0.30; // standard higher slab approximation
+        } else if (taxableNew > 2000000) {
+            taxNew = 200000 + (taxableNew - 2000000) * 0.25;
+        } else if (taxableNew > 1600000) {
+            taxNew = 120000 + (taxableNew - 1600000) * 0.20;
+        } else if (taxableNew > 1200000) {
+            taxNew = 60000 + (taxableNew - 1200000) * 0.15;
+        } else if (taxableNew > 800000) {
+            taxNew = 20000 + (taxableNew - 800000) * 0.10;
+        } else if (taxableNew > 400000) {
+            taxNew = (taxableNew - 400000) * 0.05;
+        }
+        // Section 87A rebate for new regime (Zero tax if taxable income is within threshold limits)
+        if (taxableNew <= 1200000) taxNew = 0;
+
+        const cessNew = taxNew * 0.04;
+        const totalTaxNew = taxNew + cessNew;
+
+        // Map IT Values to Table
+        document.getElementById('itAnnualGrossOld').innerText = annualGross.toFixed(2);
+        document.getElementById('itAnnualGrossNew').innerText = annualGross.toFixed(2);
+        document.getElementById('itSec80C').innerText = actual80C.toFixed(2);
+        
+        document.getElementById('itTaxableOld').innerText = taxableOld.toFixed(2);
+        document.getElementById('itTaxableNew').innerText = taxableNew.toFixed(2);
+        
+        document.getElementById('itTaxValOld').innerText = taxOld.toFixed(2);
+        document.getElementById('itTaxValNew').innerText = taxNew.toFixed(2);
+        
+        document.getElementById('itCessOld').innerText = cessOld.toFixed(2);
+        document.getElementById('itCessNew').innerText = cessNew.toFixed(2);
+        
+        document.getElementById('itTotalTaxOld').innerText = totalTaxOld.toFixed(2);
+        document.getElementById('itTotalTaxNew').innerText = totalTaxNew.toFixed(2);
+    }
+
+    document.getElementById('selectBasicTier').addEventListener('change', function() {
+        if(this.value) {
+            document.getElementById('basicAmt').value = this.value;
+            calculateValues();
+        }
+    });
+
+    document.getElementById('selectMonth').addEventListener('change', calculateValues);
+
+    function saveData() {
+        const formData = {
+            empName: document.getElementById('empName').value,
+            schoolName: document.getElementById('schoolName').value,
+            kgidNo: document.getElementById('kgidNo').value,
+            panNo: document.getElementById('panNo').value,
+            selectMonth: document.getElementById('selectMonth').value,
+            selectBasicTier: document.getElementById('selectBasicTier').value,
+            basicAmt: document.getElementById('basicAmt').value,
+            selectSfn: document.getElementById('selectSfn').value,
+            kgidPrem: document.getElementById('kgidPrem').value,
+            gpfPrem: document.getElementById('gpfPrem').value,
+            licPrem: document.getElementById('licPrem').value,
+            kgidLoan: document.getElementById('kgidLoan').value,
+            gpfLoan: document.getElementById('gpfLoan').value,
+            localRecovery: document.getElementById('localRecovery').value,
+            sec80C: document.getElementById('sec80C').value
+        };
+        localStorage.setItem('salaryRecord', JSON.stringify(formData));
+        alert("Record saved successfully!");
+    }
+
+    function editData() {
+        const saved = localStorage.getItem('salaryRecord');
+        if (!saved) {
+            alert("No saved record found.");
+            return;
+        }
+        const data = JSON.parse(saved);
+        document.getElementById('empName').value = data.empName || '';
+        document.getElementById('schoolName').value = data.schoolName || '';
+        document.getElementById('kgidNo').value = data.kgidNo || '';
+        document.getElementById('panNo').value = data.panNo || '';
+        document.getElementById('selectMonth').value = data.selectMonth || '';
+        document.getElementById('selectBasicTier').value = data.selectBasicTier || '';
+        document.getElementById('basicAmt').value = data.basicAmt || '';
+        document.getElementById('selectSfn').value = data.selectSfn || '0';
+        document.getElementById('kgidPrem').value = data.kgidPrem || '0';
+        document.getElementById('gpfPrem').value = data.gpfPrem || '0';
+        document.getElementById('licPrem').value = data.licPrem || '0';
+        document.getElementById('kgidLoan').value = data.kgidLoan || '0';
+        document.getElementById('gpfLoan').value = data.gpfLoan || '0';
+        document.getElementById('localRecovery').value = data.localRecovery || '0';
+        document.getElementById('sec80C').value = data.sec80C || '150000';
+
+        calculateValues();
+        alert("Record loaded into form.");
+    }
+
+    function deleteData() {
+        if(confirm("Are you sure you want to delete this record?")) {
+            localStorage.removeItem('salaryRecord');
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+            calculateValues();
+            alert("Record deleted.");
+        }
+    }
+
+    window.onload = function() {
+        if (localStorage.getItem('salaryRecord')) {
+            editData();
+        }
+    };
+</script>
+</body>
+</html>
